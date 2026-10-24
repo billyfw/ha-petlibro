@@ -30,6 +30,23 @@ pull request. `CHANGELOG.md` says, newest first, what this fork carries. Everyth
   through explicit entities**: the manual feed button, the two feeding-mode buttons, the settings
   switches. Nothing dispenses on its own.
 
+## Status
+
+- [x] 2026-10-24: the feeder (only that one) shared from the owner's main PETLIBRO account to the dedicated
+      account Home Assistant uses.
+- [x] 2026-10-24: fork created (public because HACS needs it), `main` built as above, release v1.3.0-lau.1;
+      the first version of this file carried identifying details for half an hour: history rewritten,
+      `scripts/check_no_pii.py` added as the CI gate (upstream's inherited workflows are disabled on the fork).
+- [x] 2026-10-24: HACS custom repository on the house's Home Assistant (`scripts/hacs.py switch --yes`), one
+      restart, config entry with the dedicated account (region US): loaded first try, 115 entities on the
+      two-bowl feeder plus the account's pet profiles, states matching the app.
+- [x] 2026-10-24: v1.3.0-lau.2 (an unmapped gender value logged an error every poll) released and staged on
+      the box; it loads at the next restart.
+- [ ] The private config repository: registry names, the dashboard wiring, the house rules (designed with the
+      owner after the raw entities were seen; nothing pre-built here).
+- [ ] Offer nothing upstream (the carried commits are other people's PRs); watch #274 and re-base on merge.
+      A port of the meal-record intake sensors from carlbai's PLAF105 class is the one addition worth making.
+
 ## Guards
 
 - **One session per PETLIBRO account.** The account Home Assistant logs into is a dedicated secondary
