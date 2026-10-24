@@ -3,6 +3,15 @@
 What this fork changed, newest first. Versions are `<upstream line>-lau.<n>`: upstream's version with a
 `lau` build number, so a fork release never shares a tag name with an upstream release.
 
+## 1.3.0-lau.2 (2026-10-24)
+
+### An unmapped gender value no longer logs an error every poll
+
+PETLIBRO's API returns `3` as the sex of a pet whose sex was never set (a pet created at a new account's
+signup). The `Gender` enum knows 0, 1 and 2, so every poll logged `Unknown gender value: 3` at ERROR
+(about once a second across the pet's entities) and the select fell back to none anyway. Both the pet
+and the account property now read an unknown value as none and say so at debug. Nothing else changed.
+
 ## 1.3.0-lau.1 (2026-10-24)
 
 ### Granary 2 Vision and Vision Duo (PLAF205)

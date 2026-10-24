@@ -212,7 +212,9 @@ class Pet(Event):
             gen = Gender(self._data.get(API.SEX) or 0)
             return gen
         except ValueError:
-            _LOGGER.error("Unknown gender value: %s", self._data.get(API.SEX))
+            # The API now returns 3 for "not set" (seen 2026-10 on a new account's pet); the enum knows
+            # 0/1/2, so an unknown value reads as NONE, at debug: it is not an error, and it repeats every poll.
+            _LOGGER.debug("Unknown gender value %s, reading it as none", self._data.get(API.SEX))
             return Gender.NONE
 
     nickname = name
