@@ -1,3 +1,8 @@
+> **billyfw's fork** of [jjjonesjr33/petlibro](https://github.com/jjjonesjr33/petlibro), carrying Granary 2 Vision and
+> Vision Duo support (upstream pull request #274 plus the Vision Duo mapping) ahead of its merge upstream, for one
+> Home Assistant that installs it through HACS as the custom repository `billyfw/ha-petlibro`. `CLAUDE.md` is the
+> operative summary and `CHANGELOG.md` says what this fork changed. Everything below is upstream's README.
+
 ![Logo](https://raw.githubusercontent.com/jjjonesjr33/ha_petlibro/master/docs/media/logo.png)
 
 ---
