@@ -69,11 +69,15 @@ def our_path(path: str) -> bool:
     return any(path == f or path.startswith(f.rstrip("/") + "/") for f in OUR_FILES)
 
 
-def scan_text(text: str, where: str, markers: list[str], findings: list[str]) -> None:
-    if where.split(":")[0].endswith("README.md") and README_SENTINEL in text:
+def scan_text(text: str, where: str, markers: list[str], findings: list[str], *, generic: bool = True,
+              path: str | None = None) -> None:
+    """Apply the generic rules (unless generic=False: markers only) and the private markers to text."""
+    if path is not None and path.endswith("README.md"):
+        if README_SENTINEL not in text:
+            return  # an upstream version of the README: nothing of ours in it
         text = text.split(README_SENTINEL)[0]
     for n, line in enumerate(text.splitlines(), 1):
-        for rule, rx in RULES.items():
+        for rule, rx in (RULES.items() if generic else ()):
             for m in rx.finditer(line):
                 v = m.group(0)
                 if rule == "email" and (EXAMPLE_DOMAIN.search(v) or v in ALLOWED_IDENTITIES):
@@ -99,7 +103,7 @@ def main() -> int:
     # 1. the tree
     for path in git("ls-files").splitlines():
         if our_path(path):
-            scan_text(Path(path).read_text(errors="replace"), path, markers, findings)
+            scan_text(Path(path).read_text(errors="replace"), path, markers, findings, path=path)
 
     # 2. history since the upstream base: messages, identities, our files' every version
     commits = git("rev-list", "HEAD", f"^{UPSTREAM_BASE}").split()
@@ -107,7 +111,8 @@ def main() -> int:
     for sha in commits:
         short = sha[:7]
         subject, ae, ce, body = git("show", "-s", "--format=%s%n%ae%n%ce%n%b", sha).split("\n", 3)
-        scan_text(subject + "\n" + body, f"commit {short} message", markers, findings)
+        # a carried commit's message carries its own author's trailers (their identity, not ours): markers only
+        scan_text(subject + "\n" + body, f"commit {short} message", markers, findings, generic=sha in ours)
         if sha in ours:
             for who, email in (("author", ae), ("committer", ce)):
                 if email not in ALLOWED_IDENTITIES:
@@ -118,7 +123,7 @@ def main() -> int:
                     blob = git("show", f"{sha}:{path}")
                 except subprocess.CalledProcessError:
                     continue  # deleted in this commit
-                scan_text(blob, f"commit {short}:{path}", markers, findings)
+                scan_text(blob, f"commit {short}:{path}", markers, findings, path=path)
 
     for f in sorted(set(findings)):
         print(f)
