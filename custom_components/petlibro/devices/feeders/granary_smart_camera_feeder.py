@@ -1,4 +1,5 @@
 import ast
+import json
 from zoneinfo import ZoneInfo
 import aiohttp
 
@@ -12,9 +13,32 @@ from homeassistant.util import dt as dt_util
 _LOGGER = getLogger(__name__)
 
 
+def _params(record: dict) -> dict:
+    """Return a work record's params, a JSON object the API sends as a string; {} when absent or malformed."""
+    params = record.get("params")
+    if isinstance(params, str):
+        try:
+            params = json.loads(params)
+        except ValueError:
+            return {}
+    return params if isinstance(params, dict) else {}
+
+
 def _grain_num(record: dict) -> int | float | None:
-    """Return a work record's dispensed portions, or None when it carries no positive number."""
+    """Return a work record's dispensed portions, or None when it carries no positive number.
+
+    Most feeders send actualGrainNum. The Granary 2 Vision Duo leaves it out and puts the amount, as text, in
+    params: {"grain": "2", "leftGrain": "1", "rightGrain": "1", "mode": ...} (grain is the total).
+    """
     value = record.get("actualGrainNum")
+    if value is None:
+        value = _params(record).get("grain")
+        if isinstance(value, str):
+            try:
+                value = float(value)
+            except ValueError:
+                return None
+            value = int(value) if value.is_integer() else value
     if isinstance(value, bool) or not isinstance(value, (int, float)) or value <= 0:
         return None
     return value

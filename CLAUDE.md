@@ -24,7 +24,7 @@ pull request. `CHANGELOG.md` says, newest first, what this fork carries. Everyth
   (PLAF105, one bowl, no camera) is a different class, in carlbai's fork; not carried.
 - `main` here = upstream `dev` (a28fe35) + PR #274 (54f22ae) + the Duo line (da70957) + our version,
   changelog, README banner, this file, `scripts/hacs.py` and `scripts/check_no_pii.py`, plus two small
-  fixes of ours (the gender value, lau.2; today's feeds as a `feeds` attribute, lau.3) and one port (today's
+  fixes of ours (the gender value, lau.2; today's feeds as a `feeds` attribute, lau.3, with sizes, lau.6) and one port (today's
   meals for the Vision class, carlbai's meal-record reader, lau.4): `CHANGELOG.md`.
   Retire the fork when upstream merges #274 and releases (offer the feeds attribute upstream first).
 - What each poll reads: grain status, real info, attribute settings, upgrade, today's plan, work records,
@@ -52,7 +52,9 @@ pull request. `CHANGELOG.md` says, newest first, what this fork carries. Everyth
 - [x] 2026-10-24: v1.3.0-lau.4: today's meals (start, grams eaten, seconds) as Today Consumed Food Weight with
       a `meals` attribute, from `MEAL_RECORD` work records (carlbai's reader); the feed record's text fields
       in its debug line, to find the dispensed amount in `params`; v1.3.0-lau.5 adds the grain status's
-      `todayFeedingQuantities` to that line (staged with lau.4 for one restart).
+      `todayFeedingQuantities` to that line (lau.4 and lau.5 live after one restart, the same evening).
+- [x] 2026-10-24: v1.3.0-lau.6: each feed's size from the record's `params` (`grain`, as text), `portions` on each
+      feed; the meal records whole in the debug line (one morning meal read 59 g where the app showed 43 g).
 - [ ] The private config repository: registry names, the dashboard wiring, the house rules (designed with the
       owner after the raw entities were seen; nothing pre-built here).
 - [ ] Offer nothing upstream (the carried commits are other people's PRs); watch #274 and re-base on merge.

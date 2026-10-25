@@ -3,6 +3,20 @@
 What this fork changed, newest first. Versions are `<upstream line>-lau.<n>`: upstream's version with a
 `lau` build number, so a fork release never shares a tag name with an upstream release.
 
+## 1.3.0-lau.6 (2026-10-24)
+
+### Each feed's size, read from the record's params (Granary 2 Vision Duo)
+
+The Vision Duo's feed records carry no `actualGrainNum`. The amount is in `params`, a JSON object sent as text:
+`{"grain": "2", "leftGrain": "1", "rightGrain": "1", "mode": "{MANUAL_MODE}"}` (grain is the total, in
+portions of 1/12 cup; the record's `content` reads "Left bowl dispensed 1/12 cup, right bowl dispensed 1/12
+cup"). A record without `actualGrainNum` now falls back to `params.grain`, so each entry of the `feeds`
+attribute gets its size, and Last Feed Quantity stops reading 0. Each feed also carries `portions`, the
+dispensed amount in the app's own unit, next to the converted `g`.
+
+The meal debug line now prints each of today's meal records whole (no serial, links masked), to match a record's
+`intake` and `duration` with what the app shows for the same meal.
+
 ## 1.3.0-lau.5 (2026-10-24)
 
 The newest feed record's debug line also prints the grain status's `todayFeedingTimes`, `todayFeedingQuantity`

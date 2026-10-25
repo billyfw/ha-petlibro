@@ -1,5 +1,6 @@
 import aiohttp
-from logging import getLogger
+import re
+from logging import DEBUG, getLogger
 
 from homeassistant.util import dt as dt_util
 
@@ -59,13 +60,12 @@ class Granary2VisionFeeder(GranarySmartCameraFeeder):
             records = await self.api.get_device_meal_records(
                 self.serial, int(start.timestamp() * 1000), int(dt_util.utcnow().timestamp() * 1000))
             self.update_data({"mealRecords": {"day": start.date().isoformat(), "records": records}})
-            if records:
-                newest = max(records, key=lambda record: record["recordTime"])
-                _LOGGER.debug(
-                    "Newest meal record: fields %s, numbers %s",
-                    sorted(newest),
-                    {k: v for k, v in newest.items() if isinstance(v, (int, float))},
-                )
+            # Each meal record whole, to match intake and duration with the app: no serial, links masked.
+            if _LOGGER.isEnabledFor(DEBUG):
+                for record in sorted(records, key=lambda record: record["recordTime"]):
+                    text = re.sub(r"https?://[^\s'\"]+", "<link>", repr(
+                        {k: v for k, v in record.items() if k not in ("deviceSn", "thumbnailSignedUrl")}))
+                    _LOGGER.debug("Meal record: %s", text.replace(self.serial, "<serial>") if self.serial else text)
         except (PetLibroAPIError, aiohttp.ClientError) as err:
             self.update_data({"mealRecords": {}})
             _LOGGER.warning("Unable to refresh meal records for Granary2VisionFeeder: %s", err)
