@@ -359,12 +359,15 @@ class GranarySmartCameraFeeder(Device):  # Inherit directly from Device
         for day_entry in self._data.get("workRecord") or []:
             for record in (day_entry.get("workRecords") or []) if isinstance(day_entry, dict) else []:
                 if isinstance(record, dict) and record.get("type") == "GRAIN_OUTPUT_SUCCESS":
+                    grain_status = self._data.get("grainStatus") or {}
                     _LOGGER.debug(
-                        "Newest feed record: fields %s, numbers %s, text %s",
+                        "Newest feed record: fields %s, numbers %s, text %s; grain status today %s",
                         sorted(record),
                         {k: v for k, v in record.items() if isinstance(v, (int, float))},
                         {k: record[k] for k in ("eventType", "category", "workRecordI18nCode", "params", "content")
                          if k in record},
+                        {k: grain_status.get(k) for k in ("todayFeedingTimes", "todayFeedingQuantity",
+                                                          "todayFeedingQuantities")},
                     )
                     return
 

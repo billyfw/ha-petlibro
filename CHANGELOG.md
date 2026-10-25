@@ -3,6 +3,12 @@
 What this fork changed, newest first. Versions are `<upstream line>-lau.<n>`: upstream's version with a
 `lau` build number, so a fork release never shares a tag name with an upstream release.
 
+## 1.3.0-lau.5 (2026-10-24)
+
+The newest feed record's debug line also prints the grain status's `todayFeedingTimes`, `todayFeedingQuantity`
+and `todayFeedingQuantities` (documented upstream as the per-feeding quantities), the second place a Vision Duo
+feed's size may be kept. Nothing else changed.
+
 ## 1.3.0-lau.4 (2026-10-24)
 
 ### Meals: what the pet ate, from the feeder's own records (Granary 2 Vision and Vision Duo)
