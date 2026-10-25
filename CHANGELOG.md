@@ -3,6 +3,23 @@
 What this fork changed, newest first. Versions are `<upstream line>-lau.<n>`: upstream's version with a
 `lau` build number, so a fork release never shares a tag name with an upstream release.
 
+## 1.3.0-lau.3 (2026-10-24)
+
+### Today's feeds as a list, from the work records
+
+The integration already fetched the feeder's work records (`/device/workRecord/list`, successful grain outputs
+over 30 days) on every poll, but only the newest record's time reached Home Assistant (Last Feed Time). The
+Today Feeding Times sensor of the Granary Smart Camera Feeder class, and so of the Granary 2 Vision and Vision
+Duo, now carries a `feeds` attribute: each of today's feeds (Home Assistant's local day), oldest first, as
+`{"time": <ISO time>, "g": <grams>}`. Grams use the same portion conversion as the Today Feeding Quantity
+(Weight) sensor, so the list adds up to it. A record without a positive portion count lists its time with
+`"g": null` rather than a made-up zero.
+
+The amount is the record's `actualGrainNum`, now read when it is a float as well as an int; Last Feed Quantity
+uses the same reading (it read 0 for any non-integer amount). Each poll also logs the newest feed record's
+field names and numbers at debug (strings are left out, so no serial), to show where a model keeps its amount
+when `actualGrainNum` is absent.
+
 ## 1.3.0-lau.2 (2026-10-24)
 
 ### An unmapped gender value no longer logs an error every poll

@@ -23,8 +23,9 @@ pull request. `CHANGELOG.md` says, newest first, what this fork carries. Everyth
   product name needs one more line (jerryfmedeiros, tested on a two-bowl unit). The plain Granary 2
   (PLAF105, one bowl, no camera) is a different class, in carlbai's fork; not carried.
 - `main` here = upstream `dev` (a28fe35) + PR #274 (54f22ae) + the Duo line (da70957) + our version,
-  changelog, README banner, this file, `scripts/hacs.py` and `scripts/check_no_pii.py`. Retire the fork
-  when upstream merges #274 and releases.
+  changelog, README banner, this file, `scripts/hacs.py` and `scripts/check_no_pii.py`, plus two small
+  fixes of ours (the gender value, lau.2; today's feeds as a `feeds` attribute, lau.3: `CHANGELOG.md`).
+  Retire the fork when upstream merges #274 and releases (offer the feeds attribute upstream first).
 - What each poll reads: grain status, real info, attribute settings, upgrade, today's plan, work records,
   plan list, events, camera credentials, free-feeding settings, real-data info. **Writes happen only
   through explicit entities**: the manual feed button, the two feeding-mode buttons, the settings
@@ -42,6 +43,10 @@ pull request. `CHANGELOG.md` says, newest first, what this fork carries. Everyth
       two-bowl feeder plus the account's pet profiles, states matching the app.
 - [x] 2026-10-24: v1.3.0-lau.2 (an unmapped gender value logged an error every poll) released, staged, and live
       after the evening restart: the error is gone from the log, the entry loaded first try.
+- [x] 2026-10-24: v1.3.0-lau.3: today's feeds (time and grams each) as a `feeds` attribute on Today Feeding
+      Times, from the work records the poll already fetched, for the owner's dashboard. Whether the Duo's work
+      records carry `actualGrainNum` is unseen (Last Feed Quantity read 0 under the int-only reading); the
+      debug line `Newest feed record: fields ...` shows it after the restart.
 - [ ] The private config repository: registry names, the dashboard wiring, the house rules (designed with the
       owner after the raw entities were seen; nothing pre-built here).
 - [ ] Offer nothing upstream (the carried commits are other people's PRs); watch #274 and re-base on merge.

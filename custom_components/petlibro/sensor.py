@@ -255,6 +255,18 @@ class PetLibroSensorEntity(PetLibroEntity[_DeviceT], SensorEntity):
                         "id": next_feed_data.get("id"),
                         "meal_call": next_feed_data.get("enableAudio"),
                     }
+            case "today_feeding_times" if hasattr(self.device, "today_feeds"):
+                # Each of today's feeds from the work records, converted like the quantity sensors.
+                return {
+                    "feeds": [
+                        {
+                            "time": feed["time"].isoformat(),
+                            "g": None if feed["portions"] is None else Unit.convert_feed(
+                                feed["portions"] * self.device.feed_conv_factor, None, Unit.GRAMS, True),
+                        }
+                        for feed in self.device.today_feeds
+                    ]
+                }
             case key if key in (
                 "today_feeding_quantity_weight",
                 "last_feed_quantity_weight", 

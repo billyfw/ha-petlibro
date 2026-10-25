@@ -11,6 +11,15 @@ from homeassistant.util import dt as dt_util
 
 _LOGGER = getLogger(__name__)
 
+
+def _grain_num(record: dict) -> int | float | None:
+    """Return a work record's dispensed portions, or None when it carries no positive number."""
+    value = record.get("actualGrainNum")
+    if isinstance(value, bool) or not isinstance(value, (int, float)) or value <= 0:
+        return None
+    return value
+
+
 class GranarySmartCameraFeeder(Device):  # Inherit directly from Device
     def __init__(self, *args, **kwargs):
         """Initialize the feeder with default values."""
@@ -49,6 +58,7 @@ class GranarySmartCameraFeeder(Device):  # Inherit directly from Device
                 "getDeviceEvents": get_device_events or {},
                 "tutkInfo": get_tutk_info or {},
             })
+            self._log_newest_feed_record()
         except PetLibroAPIError as err:
             _LOGGER.error(f"Error refreshing data for GranarySmartCameraFeeder: {err}")
 
@@ -307,7 +317,7 @@ class GranarySmartCameraFeeder(Device):  # Inherit directly from Device
         return None
 
     @property
-    def last_feed_quantity(self) -> int:
+    def last_feed_quantity(self) -> int | float:
         """Return the last feed amount."""
         raw = self._data.get("workRecord", [])
         if raw and isinstance(raw, list):
@@ -315,9 +325,46 @@ class GranarySmartCameraFeeder(Device):  # Inherit directly from Device
                 for record in day_entry.get("workRecords", []):
                     _LOGGER.debug("Evaluating record type: %s", record.get("type"))
                     if record.get("type") == "GRAIN_OUTPUT_SUCCESS":
-                        actualGrainNum = record.get("actualGrainNum")
-                        return actualGrainNum if isinstance(actualGrainNum, int) else 0
+                        return _grain_num(record) or 0
         return 0
+
+    @property
+    def today_feeds(self) -> list[dict]:
+        """Return today's successful grain outputs from the work records, oldest first.
+
+        Today is Home Assistant's local day. Each feed is {"time": local datetime, "portions": number},
+        with portions None when the record carries no amount.
+        """
+        raw = self._data.get("workRecord", [])
+        if not raw or not isinstance(raw, list):
+            return []
+        today = dt_util.now().date()
+        feeds = []
+        for day_entry in raw:
+            if not isinstance(day_entry, dict):
+                continue
+            for record in day_entry.get("workRecords") or []:
+                if not isinstance(record, dict) or record.get("type") != "GRAIN_OUTPUT_SUCCESS":
+                    continue
+                timestamp_ms = record.get("recordTime")
+                if isinstance(timestamp_ms, bool) or not isinstance(timestamp_ms, (int, float)) or not timestamp_ms:
+                    continue
+                at = dt_util.as_local(dt_util.utc_from_timestamp(timestamp_ms / 1000))
+                if at.date() == today:
+                    feeds.append({"time": at, "portions": _grain_num(record)})
+        return sorted(feeds, key=lambda feed: feed["time"])
+
+    def _log_newest_feed_record(self) -> None:
+        """Debug-log the newest feed record's field names and numbers (no strings, so no serial)."""
+        for day_entry in self._data.get("workRecord") or []:
+            for record in (day_entry.get("workRecords") or []) if isinstance(day_entry, dict) else []:
+                if isinstance(record, dict) and record.get("type") == "GRAIN_OUTPUT_SUCCESS":
+                    _LOGGER.debug(
+                        "Newest feed record: fields %s, numbers %s",
+                        sorted(record),
+                        {k: v for k, v in record.items() if isinstance(v, (int, float))},
+                    )
+                    return
 
     @property
     def feeding_plan_today_data(self) -> dict:
