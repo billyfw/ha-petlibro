@@ -1,6 +1,8 @@
 import aiohttp
 from logging import getLogger
 
+from homeassistant.util import dt as dt_util
+
 from ...exceptions import PetLibroAPIError
 from .granary_smart_camera_feeder import GranarySmartCameraFeeder
 
@@ -50,6 +52,62 @@ class Granary2VisionFeeder(GranarySmartCameraFeeder):
         except PetLibroAPIError as err:
             self.update_data({"dataRealInfo": {}})
             _LOGGER.error(f"Error refreshing data real info for Granary2VisionFeeder: {err}")
+
+        # Today's meals (the camera and scale's record of each visit). A failed read leaves no stale meals.
+        try:
+            start = dt_util.start_of_local_day()
+            records = await self.api.get_device_meal_records(
+                self.serial, int(start.timestamp() * 1000), int(dt_util.utcnow().timestamp() * 1000))
+            self.update_data({"mealRecords": {"day": start.date().isoformat(), "records": records}})
+            if records:
+                newest = max(records, key=lambda record: record["recordTime"])
+                _LOGGER.debug(
+                    "Newest meal record: fields %s, numbers %s",
+                    sorted(newest),
+                    {k: v for k, v in newest.items() if isinstance(v, (int, float))},
+                )
+        except (PetLibroAPIError, aiohttp.ClientError) as err:
+            self.update_data({"mealRecords": {}})
+            _LOGGER.warning("Unable to refresh meal records for Granary2VisionFeeder: %s", err)
+
+    def _today_meal_records(self) -> list[dict] | None:
+        """Return today's meal records, or None when they were not read today."""
+        meal_data = self._data.get("mealRecords") or {}
+        if meal_data.get("day") != dt_util.now().date().isoformat():
+            return None
+        return meal_data.get("records") or []
+
+    @property
+    def today_meals(self) -> list[dict]:
+        """Return today's meals from the meal records, oldest first.
+
+        Each is {"time": local datetime the meal started, "g": grams eaten (the scale's intake),
+        "seconds": eating time}; g or seconds is None when the record lacks it.
+        """
+        meals = []
+        for record in self._today_meal_records() or []:
+            start = _numeric_value(record.get("petEatingStartTime"))
+            end = _numeric_value(record.get("eatingEndTime"))
+            at_ms = start if start is not None else _numeric_value(record.get("recordTime"))
+            if at_ms is None:
+                continue
+            meals.append({
+                "time": dt_util.as_local(dt_util.utc_from_timestamp(at_ms / 1000)),
+                "g": _numeric_value(record.get("intake")),
+                "seconds": int((end - start) / 1000) if start is not None and end is not None and end >= start else None,
+            })
+        return sorted(meals, key=lambda meal: meal["time"])
+
+    @property
+    def today_consumed_food_weight(self) -> float | None:
+        """Return the grams eaten today, None while today's meals are unread or one lacks its intake."""
+        records = self._today_meal_records()
+        if records is None:
+            return None
+        intakes = [_numeric_value(record.get("intake")) for record in records]
+        if any(value is None for value in intakes):
+            return None
+        return round(sum(intakes), 1)
 
     @property
     def night_vision(self) -> str:

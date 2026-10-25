@@ -72,6 +72,9 @@
       },
       "portion_to_gram_ratio": {
         "name": "Grams per Portion"
+      },
+      "today_consumed_food_weight": {
+        "name": "Today Consumed Food Weight"
       }
     },
     "binary_sensor": {

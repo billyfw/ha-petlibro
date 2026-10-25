@@ -267,6 +267,14 @@ class PetLibroSensorEntity(PetLibroEntity[_DeviceT], SensorEntity):
                         for feed in self.device.today_feeds
                     ]
                 }
+            case "today_consumed_food_weight" if hasattr(self.device, "today_meals"):
+                # Each of today's meals: start time, grams eaten by the scale, eating time in seconds.
+                return {
+                    "meals": [
+                        {"time": meal["time"].isoformat(), "g": meal["g"], "seconds": meal["seconds"]}
+                        for meal in self.device.today_meals
+                    ]
+                }
             case key if key in (
                 "today_feeding_quantity_weight",
                 "last_feed_quantity_weight", 
@@ -853,6 +861,15 @@ DEVICE_SENSOR_MAP: dict[type[Device], list[PetLibroSensorEntityDescription]] = {
             state_class=SensorStateClass.MEASUREMENT,
             entity_category=EntityCategory.DIAGNOSTIC,
             should_report=lambda device: device.portion_to_gram_ratio is not None
+        ),
+        PetLibroSensorEntityDescription[Granary2VisionFeeder](
+            key="today_consumed_food_weight",
+            translation_key="today_consumed_food_weight",
+            icon="mdi:food-drumstick",
+            name="Today Consumed Food Weight",
+            native_unit_of_measurement=UnitOfMass.GRAMS,
+            device_class=SensorDeviceClass.WEIGHT,
+            state_class=SensorStateClass.TOTAL_INCREASING,
         ),
     ],
     OneRFIDSmartFeeder: [

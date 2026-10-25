@@ -24,7 +24,8 @@ pull request. `CHANGELOG.md` says, newest first, what this fork carries. Everyth
   (PLAF105, one bowl, no camera) is a different class, in carlbai's fork; not carried.
 - `main` here = upstream `dev` (a28fe35) + PR #274 (54f22ae) + the Duo line (da70957) + our version,
   changelog, README banner, this file, `scripts/hacs.py` and `scripts/check_no_pii.py`, plus two small
-  fixes of ours (the gender value, lau.2; today's feeds as a `feeds` attribute, lau.3: `CHANGELOG.md`).
+  fixes of ours (the gender value, lau.2; today's feeds as a `feeds` attribute, lau.3) and one port (today's
+  meals for the Vision class, carlbai's meal-record reader, lau.4): `CHANGELOG.md`.
   Retire the fork when upstream merges #274 and releases (offer the feeds attribute upstream first).
 - What each poll reads: grain status, real info, attribute settings, upgrade, today's plan, work records,
   plan list, events, camera credentials, free-feeding settings, real-data info. **Writes happen only
@@ -46,7 +47,11 @@ pull request. `CHANGELOG.md` says, newest first, what this fork carries. Everyth
 - [x] 2026-10-24: v1.3.0-lau.3: today's feeds (time and grams each) as a `feeds` attribute on Today Feeding
       Times, from the work records the poll already fetched, for the owner's dashboard. Whether the Duo's work
       records carry `actualGrainNum` is unseen (Last Feed Quantity read 0 under the int-only reading); the
-      debug line `Newest feed record: fields ...` shows it after the restart.
+      debug line `Newest feed record: fields ...` shows it after the restart. Seen after it: no `actualGrainNum`;
+      the record carries `params`, `content` and `workRecordI18nCode` instead.
+- [x] 2026-10-24: v1.3.0-lau.4: today's meals (start, grams eaten, seconds) as Today Consumed Food Weight with
+      a `meals` attribute, from `MEAL_RECORD` work records (carlbai's reader); the feed record's text fields
+      in its debug line, to find the dispensed amount in `params`.
 - [ ] The private config repository: registry names, the dashboard wiring, the house rules (designed with the
       owner after the raw entities were seen; nothing pre-built here).
 - [ ] Offer nothing upstream (the carried commits are other people's PRs); watch #274 and re-base on merge.

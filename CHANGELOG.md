@@ -3,6 +3,23 @@
 What this fork changed, newest first. Versions are `<upstream line>-lau.<n>`: upstream's version with a
 `lau` build number, so a fork release never shares a tag name with an upstream release.
 
+## 1.3.0-lau.4 (2026-10-24)
+
+### Meals: what the pet ate, from the feeder's own records (Granary 2 Vision and Vision Duo)
+
+The Vision feeders weigh each visit with the bowl scale and the camera, and the vendor keeps every visit as a
+`MEAL_RECORD` work record: when eating started and ended, and the grams eaten (`intake`). Each poll now reads
+today's (Home Assistant's local day) into a new sensor, **Today Consumed Food Weight** (g, total increasing, so
+long-term statistics give a daily bar), with a `meals` attribute listing each meal oldest first as
+`{"time": <start, ISO>, "g": <grams eaten>, "seconds": <eating time>}`. The reader is carlbai's, from that
+fork's Granary 2 (PLAF105) class: pages overlap and are deduplicated by record id, other record types are
+skipped, and a malformed response raises. A failed read leaves the sensor unknown for that poll (no stale
+meals), and a meal without an intake leaves the day's total unknown rather than short.
+
+The newest feed record's debug line now also carries its descriptive text fields (`eventType`, `category`,
+`workRecordI18nCode`, `params`, `content`): the Vision Duo's feed records carry no `actualGrainNum`, so the
+amount they dispensed is somewhere in that text. The newest meal record gets a debug line too.
+
 ## 1.3.0-lau.3 (2026-10-24)
 
 ### Today's feeds as a list, from the work records
