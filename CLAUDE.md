@@ -55,6 +55,12 @@ pull request. `CHANGELOG.md` says, newest first, what this fork carries. Everyth
       `todayFeedingQuantities` to that line (lau.4 and lau.5 live after one restart, the same evening).
 - [x] 2026-10-24: v1.3.0-lau.6: each feed's size from the record's `params` (`grain`, as text), `portions` on each
       feed; the meal records whole in the debug line (one morning meal read 59 g where the app showed 43 g).
+      Live the same evening. What the meal records showed: a visit's `intake` is its total, and the camera splits
+      it per pet in `petsInfo` (an unrecognized share is `petId` -1, "Unknown pet"); the app lists only the
+      recognized shares. The sensor keeps visit totals, which the owner wants (one pet in the house: an
+      unrecognized visit is still that pet). The top-level `duration` is not seconds past a minute (1 for a 66 s
+      visit), so a meal's seconds come from its start and end times. Both probe debug lines (feed record, meal
+      records) can go at the next release.
 - [ ] The private config repository: registry names, the dashboard wiring, the house rules (designed with the
       owner after the raw entities were seen; nothing pre-built here).
 - [ ] Offer nothing upstream (the carried commits are other people's PRs); watch #274 and re-base on merge.
