@@ -40,8 +40,8 @@ pull request. `CHANGELOG.md` says, newest first, what this fork carries. Everyth
 - [x] 2026-10-24: HACS custom repository on the house's Home Assistant (`scripts/hacs.py switch --yes`), one
       restart, config entry with the dedicated account (region US): loaded first try, 115 entities on the
       two-bowl feeder plus the account's pet profiles, states matching the app.
-- [x] 2026-10-24: v1.3.0-lau.2 (an unmapped gender value logged an error every poll) released and staged on
-      the box; it loads at the next restart.
+- [x] 2026-10-24: v1.3.0-lau.2 (an unmapped gender value logged an error every poll) released, staged, and live
+      after the evening restart: the error is gone from the log, the entry loaded first try.
 - [ ] The private config repository: registry names, the dashboard wiring, the house rules (designed with the
       owner after the raw entities were seen; nothing pre-built here).
 - [ ] Offer nothing upstream (the carried commits are other people's PRs); watch #274 and re-base on merge.
