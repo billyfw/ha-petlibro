@@ -51,7 +51,8 @@ pull request. `CHANGELOG.md` says, newest first, what this fork carries. Everyth
       the record carries `params`, `content` and `workRecordI18nCode` instead.
 - [x] 2026-10-24: v1.3.0-lau.4: today's meals (start, grams eaten, seconds) as Today Consumed Food Weight with
       a `meals` attribute, from `MEAL_RECORD` work records (carlbai's reader); the feed record's text fields
-      in its debug line, to find the dispensed amount in `params`.
+      in its debug line, to find the dispensed amount in `params`; v1.3.0-lau.5 adds the grain status's
+      `todayFeedingQuantities` to that line (staged with lau.4 for one restart).
 - [ ] The private config repository: registry names, the dashboard wiring, the house rules (designed with the
       owner after the raw entities were seen; nothing pre-built here).
 - [ ] Offer nothing upstream (the carried commits are other people's PRs); watch #274 and re-base on merge.
